@@ -17,9 +17,9 @@ public class Main {
         System.out.println(calc.multiply(Integer.parseInt(arr[1]), Integer.parseInt(arr[2])));
       } else if(arr[0].equals("divide")) {
         System.out.println(calc.divide(Integer.parseInt(arr[1]), Integer.parseInt(arr[2])));
-      } else if(arr[0].equals("fibonnacinumberfinder")) {
+      } else if(arr[0].equals("fibonacci")) {
         System.out.println(calc.fibonacciNumberFinder(Integer.parseInt(arr[1])));
-      } else if(arr[0].equals("inttobinarynumber")) {
+      } else if(arr[0].equals("binary")) {
         System.out.println(calc.intToBinaryNumber(Integer.parseInt(arr[1])));
       }
     }
