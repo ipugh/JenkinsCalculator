@@ -1,6 +1,6 @@
 pipeline {
     environment {
-        registry = "Your_Dockerhub_Username/Your_Dockerhub_Repository_Name"
+        registry = "ipugh/calculator-cs204"
         registryCredential = 'dockerhub'
         dockerImage=''
     }
