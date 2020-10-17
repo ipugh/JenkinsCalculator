@@ -1,83 +1,90 @@
 pipeline {
-    environment {
-        registry = "ipugh/calculator-cs204"
-        registryCredential = 'dockerhub'
-        dockerImage=''
-    }
+  environment {
+    registry = "ipugh/calculator-cs204"
+    registryCredential = 'dockerhub'
+    dockerImage = ''
+  }
 
-    agent any
-    tools {
-        maven 'apache maven 3.6.3'
-        jdk 'JDK 8'
-    }
-    stages {
-        stage ('Clean') {
-            steps {
-                sh 'mvn clean'
-            }
-        }
+  agent any
 
-        stage ('Build') {
-            steps {
-                sh 'mvn compile'
-            }
-        }
+  tools {
+     maven 'apache maven 3.6.3'
+     jdk 'JDK 8'
+  }
 
-        stage ('Short Tests') {
-            steps {
-                sh 'mvn -Dtest=CalculatorTest test'
-            }
-        }
+  stages {
 
-        stage ('Long Tests') {
-            steps {
-                sh 'mvn -Dtest=CalculatorTestThorough test'
-            }
-            post {
-                success {
-                    junit 'target/surefire-reports/**/*.xml'
-                }
-            }
-        }
+     stage ('Clean') {
+          steps {
+              sh 'mvn clean'
+          }
+      }
 
-        stage ('Package') {
-            steps {
-                sh 'mvn package'
-                archiveArtifacts artifacts: 'src/**/*.java'
-                archiveArtifacts artifacts: 'target/*.jar'
-            }
-        }
+      stage ('Build') {
+          steps {
+              sh 'mvn compile'
+          }
+      }
 
-        stage ('Building image') {
-            steps {
-                script {
-                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
-                }
-            }
-        }
+      stage ('Short Tests') {
+          steps {
+              sh 'mvn -Dtest=CalculatorTest test'
+          }
+      }
 
-        stage ('Deploy Image') {
-            steps {
-                script {
-                    docker.withRegistry('', registryCredential) {
-                        dockerImage.push()
-                    }
-                }
-            }
-        }
+      stage ('Long Tests') {
+          steps {
+              sh 'mvn -Dtest=CalculatorTestThorough test'
+          }
+          post {
+              success {
+                  junit 'target/surefire-reports/**/*.xml'
+              }
+          }
+      }
 
-        stage ('Remove unused docker image') {
-            steps {
-                sh "docker rmi $registry:$BUILD_NUMBER"
-            }
+      stage ('Package') {
+          steps {
+              sh 'mvn package'
+              archiveArtifacts artifacts: 'src/**/*.java'
+              archiveArtifacts artifacts: 'target/*.jar'
+          }
+      }
+
+      stage('Building image') {
+        steps{
+          script {
+            dockerImage = docker.build registry + ":$BUILD_NUMBER"
+          }
         }
-    }
-    post {
-        failure {
+      }
+
+      stage('Deploy Image') {
+        steps{
+          script {
+            docker.withRegistry( '', registryCredential ) {
+              dockerImage.push()
+            }
+          }
+        }
+      }
+      
+      stage('Remove Unused docker image') {
+          steps{
+            sh "docker rmi $registry:$BUILD_NUMBER"
+          }
+        }
+      }
+
+      post {
+          failure {
               mail to: 'spysick@gmail.com',
               subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
               body: "Something is wrong with ${env.BUILD_URL}"
-        }
-    }
+          }
+      }
 }
+
+
+
 
