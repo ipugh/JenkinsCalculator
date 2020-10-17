@@ -2,7 +2,7 @@ pipeline {
     environment {
         registry = "ipugh/calculator-cs204"
         registryCredential = 'dockerhub'
-        dockerImage='calculator'
+        dockerImage=''
     }
 
     agent any
